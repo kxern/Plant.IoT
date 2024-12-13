@@ -39,4 +39,4 @@ Below is the IoT flow in Node-RED which integrates sensors and MQTT communicatio
 
 This is the Node-RED flow used for testing purposes.
 
-![Node-RED Test Flow](images/nodered_test_flow.png)
+![Node-RED Test Flow](images/NodeRed_test_flow.png)
