@@ -1,0 +1,193 @@
+[
+    {
+        "id": "e70e784af5eb4629",
+        "type": "tab",
+        "label": "Test Flow",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "ca6e47f6108dc08e",
+        "type": "mqtt out",
+        "z": "e70e784af5eb4629",
+        "name": "publish 2 mqtt",
+        "topic": "topic/esp32",
+        "qos": "",
+        "retain": "",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "31efa19dac34c149",
+        "x": 480,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "9ed1d6229d6d017c",
+        "type": "inject",
+        "z": "e70e784af5eb4629",
+        "name": "publish",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "Hello Test",
+        "payloadType": "str",
+        "x": 110,
+        "y": 80,
+        "wires": [
+            [
+                "ca6e47f6108dc08e"
+            ]
+        ]
+    },
+    {
+        "id": "3ba5c0e236b3e6e3",
+        "type": "comment",
+        "z": "e70e784af5eb4629",
+        "name": "Publish test",
+        "info": "",
+        "x": 130,
+        "y": 40,
+        "wires": []
+    },
+    {
+        "id": "e30f3cc5a5113fd3",
+        "type": "telegram sender",
+        "z": "e70e784af5eb4629",
+        "name": "",
+        "bot": "***REMOVED***",
+        "haserroroutput": false,
+        "outputs": 1,
+        "x": 570,
+        "y": 200,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "70e5bddc2785513f",
+        "type": "inject",
+        "z": "e70e784af5eb4629",
+        "name": "Telegram Test MSG",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "test",
+        "payload": "",
+        "payloadType": "date",
+        "x": 150,
+        "y": 200,
+        "wires": [
+            [
+                "38f96f7eaa2f0cb2"
+            ]
+        ]
+    },
+    {
+        "id": "38f96f7eaa2f0cb2",
+        "type": "function",
+        "z": "e70e784af5eb4629",
+        "name": "test.payload",
+        "func": "msg.payload = {\n    chatId: '***REMOVED***',\n    type: 'message',\n    content: 'Dies ist eine Testnachricht von HomePi-Bot.'\n};\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 350,
+        "y": 200,
+        "wires": [
+            [
+                "e30f3cc5a5113fd3"
+            ]
+        ]
+    },
+    {
+        "id": "83a88e3663e50cff",
+        "type": "comment",
+        "z": "e70e784af5eb4629",
+        "name": "Telegram Test MSG",
+        "info": "",
+        "x": 150,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "31efa19dac34c149",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "192.168.1.198",
+        "port": "1883",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "***REMOVED***",
+        "type": "telegram bot",
+        "botname": "HomePi",
+        "usernames": "",
+        "chatids": "",
+        "baseapiurl": "",
+        "testenvironment": false,
+        "updatemode": "polling",
+        "pollinterval": "300",
+        "usesocks": false,
+        "sockshost": "",
+        "socksprotocol": "socks5",
+        "socksport": "6667",
+        "socksusername": "anonymous",
+        "sockspassword": "",
+        "bothost": "",
+        "botpath": "",
+        "localbotport": "8443",
+        "publicbotport": "8443",
+        "privatekey": "",
+        "certificate": "",
+        "useselfsignedcertificate": false,
+        "sslterminated": false,
+        "verboselogging": false
+    }
+]
