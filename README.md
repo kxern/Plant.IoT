@@ -14,11 +14,7 @@ This project uses an **ESP32** to send sensor data via **MQTT**, which is proces
 
 ### 2. Node-RED Setup
 - Import the flow file into Node-RED.
-- Configure MQTT, InfluxDB, and the Telegram bot as described below.
-
-### 3. Telegram Bot Setup
-- Configure the Telegram bot in Node-RED to query the data.
-- Set the bot token and chat IDs in the Node-RED Telegram node.
+- Configure MQTT, InfluxDB, and the Telegram bot.
 
 ---
 
