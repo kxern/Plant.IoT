@@ -33,7 +33,7 @@ This project demonstrates the integration of IoT devices using Node-RED.
 
 Below is the IoT flow in Node-RED which integrates sensors and MQTT communication.
 
-![Node-RED IoT Flow](images/nodered_iot_flow.png)
+![Node-RED IoT Flow](images/NodeRed_flow.png)
 
 ## Test Flow Diagram
 
