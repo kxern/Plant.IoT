@@ -1,0 +1,380 @@
+[
+    {
+        "id": "15fceaa5c75b024e",
+        "type": "tab",
+        "label": "IoT Flow 1",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "eadac0fd94a65ae2",
+        "type": "mqtt in",
+        "z": "15fceaa5c75b024e",
+        "name": "ESP32",
+        "topic": "topic/esp32",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "31efa19dac34c149",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 110,
+        "y": 180,
+        "wires": [
+            [
+                "44b024acdac0ab65"
+            ]
+        ]
+    },
+    {
+        "id": "4799db080f2bc551",
+        "type": "debug",
+        "z": "15fceaa5c75b024e",
+        "name": "debug: mqtt data",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 690,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "b4e84b119056eddd",
+        "type": "comment",
+        "z": "15fceaa5c75b024e",
+        "name": "MQTT InfluxDB2 link",
+        "info": "",
+        "x": 150,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "44b024acdac0ab65",
+        "type": "json",
+        "z": "15fceaa5c75b024e",
+        "name": "",
+        "property": "payload",
+        "action": "obj",
+        "pretty": true,
+        "x": 330,
+        "y": 180,
+        "wires": [
+            [
+                "d4022c9cd130a726",
+                "b68a7f4c50035848",
+                "4799db080f2bc551"
+            ]
+        ]
+    },
+    {
+        "id": "16bf9fcb0054db3f",
+        "type": "telegram command",
+        "z": "15fceaa5c75b024e",
+        "name": "",
+        "command": "/data",
+        "description": "",
+        "registercommand": false,
+        "language": "",
+        "scope": "default",
+        "bot": "***REMOVED***",
+        "strict": false,
+        "hasresponse": true,
+        "useregex": false,
+        "removeregexcommand": false,
+        "outputs": 2,
+        "x": 110,
+        "y": 440,
+        "wires": [
+            [
+                "53010eb6e3173643"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "53010eb6e3173643",
+        "type": "function",
+        "z": "15fceaa5c75b024e",
+        "name": "Data keyboard",
+        "func": "var opts = {\n    reply_markup: JSON.stringify({\n        \"inline_keyboard\": [[\n            {\n                \"text\": \"Temperature\",\n                \"callback_data\": \"1\"\n            },\n            {\n                \"text\": \"Humidity\",\n                \"callback_data\": \"2\"\n            }\n        ]]\n    })\n};\n\nmsg.error = false;\n\nmsg.payload.content = 'Selection?';\nmsg.payload.options = opts;\nmsg.payload.chatId = ***REMOVED***;\nmsg.payload.type = \"message\";\n\nreturn [msg];",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 360,
+        "y": 440,
+        "wires": [
+            [
+                "3b76cbe00705e8bd"
+            ]
+        ]
+    },
+    {
+        "id": "3b76cbe00705e8bd",
+        "type": "telegram sender",
+        "z": "15fceaa5c75b024e",
+        "name": "",
+        "bot": "***REMOVED***",
+        "haserroroutput": false,
+        "outputs": 1,
+        "x": 570,
+        "y": 440,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "7abcebfd20ed2bdf",
+        "type": "function",
+        "z": "15fceaa5c75b024e",
+        "name": "msg.payload",
+        "func": "msg.callback = msg.payload;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 350,
+        "y": 560,
+        "wires": [
+            [
+                "a70d56b9a5fce497"
+            ]
+        ]
+    },
+    {
+        "id": "e53263d11d97c5a9",
+        "type": "function",
+        "z": "15fceaa5c75b024e",
+        "name": "user output",
+        "func": "if (!msg.payload || !msg.payload.length) {\n    msg.payload.content = \"Keine Daten verfügbar.\";\n    return msg;\n}\n\n// Datenobjekte in einem Lookup-Objekt speichern\nlet data = {};\nmsg.payload.forEach(entry => {\n    data[entry._field] = entry._value;\n});\n\nswitch (msg.callback.content) {\n    case '1':\n        if ('temperature' in data) {\n            msg.payload.content = `${data.temperature} °C`;\n        } else {\n            msg.payload.content = \"Keine Temperaturdaten verfügbar.\";\n        }\n        break;\n    case '2':\n        if ('humidity' in data) {\n            msg.payload.content = `${data.humidity}%`;\n        } else {\n            msg.payload.content = \"Keine Feuchtigkeitsdaten verfügbar.\";\n        }\n        break;\n    default:\n        msg.payload.content = \"Ungültige Auswahl.\";\n}\nmsg.payload.type = \"message\";\nmsg.payload.chatId = \"***REMOVED***\";\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 750,
+        "y": 520,
+        "wires": [
+            [
+                "bf93635c21e1f2b9"
+            ]
+        ]
+    },
+    {
+        "id": "bf93635c21e1f2b9",
+        "type": "telegram sender",
+        "z": "15fceaa5c75b024e",
+        "name": "",
+        "bot": "***REMOVED***",
+        "haserroroutput": false,
+        "outputs": 1,
+        "x": 1010,
+        "y": 520,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "4b53f459a9b352da",
+        "type": "telegram event",
+        "z": "15fceaa5c75b024e",
+        "name": "",
+        "bot": "***REMOVED***",
+        "event": "callback_query",
+        "autoanswer": false,
+        "x": 140,
+        "y": 560,
+        "wires": [
+            [
+                "7abcebfd20ed2bdf"
+            ]
+        ]
+    },
+    {
+        "id": "c741e49c7ebadf0a",
+        "type": "comment",
+        "z": "15fceaa5c75b024e",
+        "name": "Telegram - Query hum&temp",
+        "info": "",
+        "x": 180,
+        "y": 360,
+        "wires": []
+    },
+    {
+        "id": "88aa16961d5d697e",
+        "type": "debug",
+        "z": "15fceaa5c75b024e",
+        "name": "Influx Query output",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 870,
+        "y": 600,
+        "wires": []
+    },
+    {
+        "id": "b68a7f4c50035848",
+        "type": "trigger",
+        "z": "15fceaa5c75b024e",
+        "name": "",
+        "op1": "",
+        "op2": "{\"type\":\"message\",\"chatId\":\"***REMOVED***\",\"content\":\"ESP32 sensor timed out\"}",
+        "op1type": "nul",
+        "op2type": "json",
+        "duration": "2",
+        "extend": true,
+        "overrideDelay": false,
+        "units": "min",
+        "reset": "",
+        "bytopic": "all",
+        "topic": "topic",
+        "outputs": 1,
+        "x": 750,
+        "y": 120,
+        "wires": [
+            [
+                "16448e67e429ee2e"
+            ]
+        ]
+    },
+    {
+        "id": "16448e67e429ee2e",
+        "type": "telegram sender",
+        "z": "15fceaa5c75b024e",
+        "name": "",
+        "bot": "***REMOVED***",
+        "haserroroutput": false,
+        "outputs": 1,
+        "x": 1010,
+        "y": 120,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "d4022c9cd130a726",
+        "type": "influxdb out",
+        "z": "15fceaa5c75b024e",
+        "influxdb": "43956618fe265573",
+        "name": "InfluxDB esp32",
+        "measurement": "esp32",
+        "precision": "",
+        "retentionPolicy": "",
+        "database": "database",
+        "precisionV18FluxV20": "ms",
+        "retentionPolicyV18Flux": "",
+        "org": "esp32",
+        "bucket": "esp32",
+        "x": 560,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "a70d56b9a5fce497",
+        "type": "influxdb in",
+        "z": "15fceaa5c75b024e",
+        "influxdb": "43956618fe265573",
+        "name": "",
+        "query": "from(bucket: \"esp32\")\n  |> range(start: -1h) \n  |> filter(fn: (r) => r._measurement == \"esp32\") \n  |> filter(fn: (r) => r._field == \"humidity\" or r._field == \"temperature\") \n  |> sort(columns: [\"_time\"], desc: true) \n  |> limit(n: 1) ",
+        "rawOutput": false,
+        "precision": "",
+        "retentionPolicy": "",
+        "org": "esp32",
+        "x": 560,
+        "y": 560,
+        "wires": [
+            [
+                "e53263d11d97c5a9",
+                "88aa16961d5d697e"
+            ]
+        ]
+    },
+    {
+        "id": "31efa19dac34c149",
+        "type": "mqtt-broker",
+        "name": "",
+        "broker": "192.168.1.198",
+        "port": "1883",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "***REMOVED***",
+        "type": "telegram bot",
+        "botname": "HomePi",
+        "usernames": "",
+        "chatids": "",
+        "baseapiurl": "",
+        "testenvironment": false,
+        "updatemode": "polling",
+        "pollinterval": "300",
+        "usesocks": false,
+        "sockshost": "",
+        "socksprotocol": "socks5",
+        "socksport": "6667",
+        "socksusername": "anonymous",
+        "sockspassword": "",
+        "bothost": "",
+        "botpath": "",
+        "localbotport": "8443",
+        "publicbotport": "8443",
+        "privatekey": "",
+        "certificate": "",
+        "useselfsignedcertificate": false,
+        "sslterminated": false,
+        "verboselogging": false
+    },
+    {
+        "id": "43956618fe265573",
+        "type": "influxdb",
+        "hostname": "127.0.0.1",
+        "port": "8086",
+        "protocol": "http",
+        "database": "database",
+        "name": "InfluxDB",
+        "usetls": false,
+        "tls": "",
+        "influxdbVersion": "2.0",
+        "url": "http://192.168.1.198:8086",
+        "timeout": "10",
+        "rejectUnauthorized": false
+    }
+]
