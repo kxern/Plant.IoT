@@ -1,6 +1,3 @@
-#include "esp32-hal-adc.h"
-#include "WString.h"
-#include "HardwareSerial.h"
 #include "mSensor.h"
 #include <Arduino.h>
 
