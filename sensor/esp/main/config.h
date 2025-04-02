@@ -3,12 +3,9 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-// Device settings
-const char* clientName = "YOUR_DEVICE_NAME";  // Set your device name here
-
 // Sensor configuration
-constexpr int wetValue = 3300;  // Adjust the wet value here
-constexpr int dryValue = 2500;  // Adjust the dry value here
+constexpr int wetValue = 1360;  // Adjust the wet value here
+constexpr int dryValue = 2670;  // Adjust the dry value here
 
 // WiFi Credentials
 const char* ssid = "YOUR_WIFI_SSID";  // Set your Wi-Fi SSID here

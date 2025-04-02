@@ -1,25 +1,26 @@
 #include <WiFi.h>
 #include "config.h"
 #include <PubSubClient.h>
+#include "mSensor.h"
 // #include <ArduinoJson.h>
 
-constexpr int sensorPin = 34;   // Set input Pin
-
 unsigned long lastSensorReadTime = 0;
-const unsigned long sensorReadInterval = 60 * 60 * 1000; // 1h (in ms) interval for reading sensor
+const unsigned long sensorReadInterval = 10 * 1000; // 1h (in ms) interval for reading sensor
 
 WiFiClient espClient; // Create a WiFi client object for establishing a WiFi connection
 PubSubClient client(espClient); // Create an MQTT client object using the WiFi client to communicate over the network
 
+SoilMoistureSensor sensor1(34, dryValue, wetValue); // Create an instance of SoilMoistureSensor
+
 void setup() {
   Serial.begin(115200); // Initialize serial communication at a baud rate of 115200
-
-  analogReadResolution(12); // Set resolution of the analog-to-digital converter to 12 bits
-  analogSetAttenuation(ADC_11db); // Set the analog input attenuation to 11dB for a wider input range
-  
+  analogReadResolution(12);  // Set resolution of the analog-to-digital converter to 12 bits
+  analogSetAttenuation(ADC_11db);  // Set the analog input attenuation to 11dB for a wider input range
+  sensor1.begin(); // Initialize sensor1
   connectWifi();
   
   client.setServer(mqttServer, mqttPort);
+  client.setSocketTimeout(5); // 5 Sec Timeout
   connectMQTT();
 }
 
@@ -29,8 +30,8 @@ void loop() {
   // Check if it's time to read the sensor based on the defined interval
   if (currentMillis - lastSensorReadTime >= sensorReadInterval){
     lastSensorReadTime = currentMillis; // update last read time to current time 
-    int rawValue = readSensorRaw();
-    int moisture = moisturePercent(rawValue);
+    int rawVal1 = sensor1.readRaw();
+    int moisture1 = sensor1.getMoisture();
     //
     // Send MQTT Json
   }
@@ -40,23 +41,8 @@ void loop() {
 }
 
 
-int readSensorRaw(){
-  int rawValue = analogRead(sensorPin);
-  Serial.println("Raw Value: " + String(rawValue));
-  return rawValue;
-}
 
-int moisturePercent(int val){
-  // Map the raw sensor value (val) from the range of dryValue to wetValue
-  // to a percentage value between 0 and 100.
-  int moisturePercent = map(val, dryValue, wetValue, 0, 100);
 
-  // Constrain the moisture percentage to be within the range of 0 to 100 to avoid invalid or out-of-range values.
-  moisturePercent = constrain(moisturePercent, 0, 100);
-  
-  Serial.println("Moisture in percent:" + String(moisturePercent) + "%");
-  return moisturePercent;
-  }
 
 void connectWifi(){
   Serial.println("Connecting to WiFi " + String(ssid));
@@ -70,26 +56,48 @@ void connectWifi(){
   Serial.println("IP: " + WiFi.localIP().toString()); // Print IP
 }
 
-void connectMQTT(){
+void connectMQTT() {
   int attempts = 0;
-  int maxAttempts = 60; // Maximum number of attempts (5 min total) 
-  while (!client.connected() && attempts < maxAttempts){
-    Serial.println("Connecting to MQTT..");
-  if (client.connect(clientName, mqttUser, mqttPass)){
-    Serial.println("MQTT connected");
-  } else {
-    // If connection fails, print the error and retry
-    Serial.println("failed with state " + String(client.state()));
-    attempts++;
-    delay(5000); // 5 Sec delay
+  const int maxAttempts = 60; // 5 Minute (60x5s)
+  String clientId = "ESP32-" + String((uint32_t)ESP.getEfuseMac(), HEX); // Dynamic ClientID
+
+  while (!client.connected() && attempts < maxAttempts) {
+    Serial.println("Attempt " + String(attempts+1) + " of " + String(maxAttempts));
+
+    if (client.connect(clientId.c_str(), mqttUser, mqttPass)) {
+      Serial.println("MQTT connected!");
+      Serial.println("Client ID: " + clientId);
+      return;
+    } else {
+      Serial.println("Failed, state: " + String(client.state()));
+      Serial.println("Error: " + getMQTTError(client.state()));
+      attempts++;
+      delay(5000);
+      
+      // Check WiFi-Connection
+      if (WiFi.status() != WL_CONNECTED) {
+        connectWifi();
+      }
     }
   }
-  if (attempts >= maxAttempts){ // Shutdown after maxAttempts
-    Serial.println("Max number of connection attempts reached.");
-    Serial.println("Please press the reset button to restart.");
-    Serial.println("Entering shutdown mode...");
-    esp_deep_sleep_start();
-  }
+
+  Serial.println("Max number of connection attempts reached.");
+  Serial.println("Please press the reset button to restart.");
+  Serial.println("Entering shutdown mode...");
+  esp_deep_sleep_start();
 }
 
-
+String getMQTTError(int state) {
+  switch(state) {
+    case -4: return "Connection timeout";
+    case -3: return "Connection lost";
+    case -2: return "Connect failed";
+    case -1: return "Disconnected";
+    case 1: return "Bad protocol";
+    case 2: return "ID rejected";
+    case 3: return "Server unavailable";
+    case 4: return "Bad credentials";
+    case 5: return "Not authorized";
+    default: return "Unknown error";
+  }
+}
