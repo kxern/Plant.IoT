@@ -37,7 +37,7 @@ void loop() {
   }
 
   client.loop();
-  delay(5000); // 5 Sec delay
+  delay(1000); // 1 Sec delay
 }
 
 
