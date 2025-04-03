@@ -1,20 +1,24 @@
 #include "mSensor.h"
 #include <Arduino.h>
 
+// Constructor for the SoilMoistureSensor, taking pin, dryValue, and wetValue as arguments
 SoilMoistureSensor::SoilMoistureSensor(int pin, int dryValue, int wetValue) {
-  this->pin = pin;
-  this->dryValue = dryValue;
-  this->wetValue = wetValue;
+  this->pin = pin;            // Sets the pin the sensor is connected to
+  this->dryValue = dryValue;  // Sets the threshold for dry soil (sensor value when the soil is dry)
+  this->wetValue = wetValue;  // Sets the threshold for wet soil (sensor value when the soil is completely wet)
 }
 
+// Initializes the sensor (sets the pin as an input)
 void SoilMoistureSensor::begin() {
   pinMode(pin, INPUT);  // Set input Pin
 }
 
+// Reads the raw value from the sensor (analog signal)
 int SoilMoistureSensor::readRaw() {
   return analogRead(pin);  // Read raw sensor value
 }
 
+// Calculates the moisture level based on the dry and wet thresholds
 int SoilMoistureSensor::getMoisture() {
   int rawValue = readRaw();  // Read raw value
 
@@ -26,5 +30,5 @@ int SoilMoistureSensor::getMoisture() {
   moisturePercent = constrain(moisturePercent, 0, 100);
   Serial.println("Raw value: " + String(rawValue));
   Serial.println("Moisture in percent: " + String(moisturePercent) + "%");
-  return moisturePercent;
+  return moisturePercent;  // Returns the calculated moisture percentage
 }
