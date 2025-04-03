@@ -1,4 +1,3 @@
-// sensor.h
 #ifndef SENSOR_H
 #define SENSOR_H
 
@@ -6,15 +5,15 @@
 
 class SoilMoistureSensor {
 public:
-    SoilMoistureSensor(int pin, int dryValue, int wetValue);  // Constructor
-    void begin();  // Initialize sensor
-    int readRaw();  // Read raw sensor value
-    int getMoisture();  // Calculate moisture
+  SoilMoistureSensor(int pin, int dryValue, int wetValue);  // Constructor
+  void begin();                                             // Initialize sensor
+  int readRaw();                                            // Read raw sensor value
+  int getMoisture();                                        // Calculate moisture
 
 private:
-    int pin;
-    int dryValue;
-    int wetValue;
+  int pin;
+  int dryValue;
+  int wetValue;
 };
 
 #endif

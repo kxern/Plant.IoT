@@ -5,31 +5,31 @@
 // #include <ArduinoJson.h>
 
 unsigned long lastSensorReadTime = 0;
-const unsigned long sensorReadInterval = 10 * 1000; // 1h (in ms) interval for reading sensor
+const unsigned long sensorReadInterval = 10 * 1000;  // 10 Sec (in ms) interval for reading sensor
 
-WiFiClient espClient; // Create a WiFi client object for establishing a WiFi connection
-PubSubClient client(espClient); // Create an MQTT client object using the WiFi client to communicate over the network
+WiFiClient espClient;            // Create a WiFi client object for establishing a WiFi connection
+PubSubClient client(espClient);  // Create an MQTT client object using the WiFi client to communicate over the network
 
-SoilMoistureSensor sensor1(34, dryValue, wetValue); // Create an instance of SoilMoistureSensor
+SoilMoistureSensor sensor1(34, dryValue, wetValue);  // Create an instance of SoilMoistureSensor
 
 void setup() {
-  Serial.begin(115200); // Initialize serial communication at a baud rate of 115200
-  analogReadResolution(12);  // Set resolution of the analog-to-digital converter to 12 bits
+  Serial.begin(115200);            // Initialize serial communication at a baud rate of 115200
+  analogReadResolution(12);        // Set resolution of the analog-to-digital converter to 12 bits
   analogSetAttenuation(ADC_11db);  // Set the analog input attenuation to 11dB for a wider input range
-  sensor1.begin(); // Initialize sensor1
+  sensor1.begin();                 // Initialize sensor1
   connectWifi();
-  
+
   client.setServer(mqttServer, mqttPort);
-  client.setSocketTimeout(5); // 5 Sec Timeout
+  client.setSocketTimeout(5);  // 5 Sec Timeout
   connectMQTT();
 }
 
-void loop() { 
-  unsigned long currentMillis = millis(); // Get current time in ms
+void loop() {
+  unsigned long currentMillis = millis();  // Get current time in ms
 
   // Check if it's time to read the sensor based on the defined interval
-  if (currentMillis - lastSensorReadTime >= sensorReadInterval){
-    lastSensorReadTime = currentMillis; // update last read time to current time 
+  if (currentMillis - lastSensorReadTime >= sensorReadInterval) {
+    lastSensorReadTime = currentMillis;  // update last read time to current time
     int rawVal1 = sensor1.readRaw();
     int moisture1 = sensor1.getMoisture();
     //
@@ -37,14 +37,14 @@ void loop() {
   }
 
   client.loop();
-  delay(1000); // 1 Sec delay
+  delay(1000);  // 1 Sec delay
 }
 
 
 
 
 
-void connectWifi(){
+void connectWifi() {
   Serial.println("Connecting to WiFi " + String(ssid));
   WiFi.begin(ssid, pass);
   // Wait for connection
@@ -53,16 +53,16 @@ void connectWifi(){
     Serial.print(".");
   }
   Serial.println("WiFi connected");
-  Serial.println("IP: " + WiFi.localIP().toString()); // Print IP
+  Serial.println("IP: " + WiFi.localIP().toString());  // Print IP
 }
 
 void connectMQTT() {
   int attempts = 0;
-  const int maxAttempts = 60; // 5 Minute (60x5s)
-  String clientId = "ESP32-" + String((uint32_t)ESP.getEfuseMac(), HEX); // Dynamic ClientID
+  const int maxAttempts = 60;                                             // 5 Minute (60x5s)
+  String clientId = "ESP32-" + String((uint32_t)ESP.getEfuseMac(), HEX);  // Dynamic ClientID
 
   while (!client.connected() && attempts < maxAttempts) {
-    Serial.println("Attempt " + String(attempts+1) + " of " + String(maxAttempts));
+    Serial.println("Attempt " + String(attempts + 1) + " of " + String(maxAttempts));
 
     if (client.connect(clientId.c_str(), mqttUser, mqttPass)) {
       Serial.println("MQTT connected!");
@@ -73,7 +73,7 @@ void connectMQTT() {
       Serial.println("Error: " + getMQTTError(client.state()));
       attempts++;
       delay(5000);
-      
+
       // Check WiFi-Connection
       if (WiFi.status() != WL_CONNECTED) {
         connectWifi();
@@ -88,7 +88,7 @@ void connectMQTT() {
 }
 
 String getMQTTError(int state) {
-  switch(state) {
+  switch (state) {
     case -4: return "Connection timeout";
     case -3: return "Connection lost";
     case -2: return "Connect failed";
