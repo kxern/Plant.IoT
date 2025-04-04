@@ -1,6 +1,7 @@
 #include "mSensor.h"
 #include <Arduino.h>
 
+
 // Constructor for the SoilMoistureSensor, taking pin, dryValue, and wetValue as arguments
 SoilMoistureSensor::SoilMoistureSensor(int pin, int dryValue, int wetValue) {
   this->pin = pin;            // Sets the pin the sensor is connected to
@@ -8,15 +9,18 @@ SoilMoistureSensor::SoilMoistureSensor(int pin, int dryValue, int wetValue) {
   this->wetValue = wetValue;  // Sets the threshold for wet soil (sensor value when the soil is completely wet)
 }
 
+
 // Initializes the sensor (sets the pin as an input)
 void SoilMoistureSensor::begin() {
   pinMode(pin, INPUT);  // Set input Pin
 }
 
+
 // Reads the raw value from the sensor (analog signal)
 int SoilMoistureSensor::readRaw() {
   return analogRead(pin);  // Read raw sensor value
 }
+
 
 // Calculates the moisture level based on the dry and wet thresholds
 int SoilMoistureSensor::getMoisture() {
